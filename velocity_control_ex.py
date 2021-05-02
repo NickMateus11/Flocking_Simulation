@@ -9,6 +9,7 @@ screen = pygame.display.set_mode((w, h))
 
 BLACK = pygame.Color(0, 0, 0)
 WHITE = pygame.Color(255, 255, 255)
+GRAY  = pygame.Color(100, 100, 100)
 
 def dist(A, B):
     return ((A[0]-B[0])**2 + (A[1]-B[1])**2)**0.5
@@ -78,13 +79,13 @@ def main():
 
         pygame.draw.circle(screen, WHITE, pos, r, 1)
 
-        # if (abs(vy)>0.5 or abs(vx)>0.5):
-        #     trail.append(tuple(pos))
+        if (abs(vy)>0.5 or abs(vx)>0.5):
+            trail.append(tuple(pos))
 
-        # if len(trail) > 2:
-        #     pygame.draw.lines(screen, WHITE, False, trail, 1)
-        # if len(trail) > 50 or (trail and abs(vy)<0.5 and abs(vx)<0.5):
-        #     trail.pop(0)
+        if len(trail) > 2:
+            pygame.draw.lines(screen, GRAY, False, trail, 1)
+        if len(trail) > 150 or (trail and abs(vy)<0.5 and abs(vx)<0.5):
+            trail.pop(0)
         
         pygame.display.flip()
     

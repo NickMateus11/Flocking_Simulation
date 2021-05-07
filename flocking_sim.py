@@ -54,11 +54,9 @@ class Bird():
 
 '''
 Flocking Rules:
-
 Cohension - birds try to get closer to surrounding groups of birds
 Separation - birds avoid colliding
 Alignment - align velocity vectors of nearby birds
-
 '''
 
 def cohesion(bird, flock, factor):
@@ -109,15 +107,16 @@ def alignment(bird, flock, factor):
 
 def main():
     r = 10
-    vmax = 5
+    vmax = 15
+    slow_down_v = 0.5
     dt = 0.05
     trail = []
     eps = r/2
     dist_error = 0
 
     coh = 5e-4
-    sep = 1e-3
-    align = 1e-3
+    sep = 5e-3
+    align = 5e-3
 
     num_birds = 30
     birds = [Bird( (random.randint(r,w-r), random.randint(r,h-r)) ) for _ in range(num_birds)]
@@ -131,21 +130,29 @@ def main():
                 running = False
 
         for bird in birds:
-            if bird.pos.x + bird.vx*dt > w-r or bird.pos.x + bird.vx*dt < r:
-                bird.vx *= -1
-            if bird.pos.y + bird.vy*dt > h-r or bird.pos.y + bird.vy*dt < r:
-                bird.vy *= -1
+            if bird.pos.x + bird.vx*dt > w-4*r:
+                bird.vx -= slow_down_v
+            if bird.pos.x + bird.vx*dt < 4*r:
+                bird.vx += slow_down_v
+            if bird.pos.y + bird.vy*dt > h-4*r:
+                bird.vy -= slow_down_v 
+            if bird.pos.y + bird.vy*dt < 4*r:
+                bird.vy += slow_down_v
 
             v_res = cohesion(bird, birds, coh) + separation(bird, birds, sep) + alignment(bird, birds, align)
             vx = sum(v_res[::2])
             vy = sum(v_res[1::2])
-            bird.vx += vx
-            bird.vy += vy
+            bird.vx += vx*2
+            bird.vy += vy*2
 
             if abs(bird.vx) > vmax:
                 bird.vx = vmax if bird.vx>0 else -vmax
             if abs(bird.vy) > vmax:
                 bird.vy = vmax if bird.vy>0 else -vmax
+
+            if abs(bird.vx) < 5 and abs(bird.vy) < 5:
+                bird.vx *= 1.1 
+                bird.vy *= 1.1
 
             bird.pos.x += bird.vx*dt
             bird.pos.y += bird.vy*dt
@@ -163,4 +170,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

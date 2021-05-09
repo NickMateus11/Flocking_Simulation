@@ -17,7 +17,7 @@ def dist(A, B):
 def mag(A):
     return dist( (0,0), A)
 
-def draw_arrow(start, end):
+def draw_arrow(start, end, tip=False):
     dir_v = (end[0]-start[0], end[1]-start[1])
     if mag(dir_v) < 1:
         return 
@@ -27,11 +27,12 @@ def draw_arrow(start, end):
     mid_p = ( (end[0] - dir_v[0]*scale), (end[1] - dir_v[1]*scale) )
     arm_mag_perp = dist(end,mid_p) * math.tan(math.pi/6)
 
-    lines = [
-        (start, end),
-        (end, (-arm_mag_perp*unit_v[1] + mid_p[0],  arm_mag_perp*unit_v[0] + mid_p[1])),
-        (end, ( arm_mag_perp*unit_v[1] + mid_p[0], -arm_mag_perp*unit_v[0] + mid_p[1])),
-    ]
+    lines = [(start, end)]
+    if tip:
+        lines += [
+            (end, (-arm_mag_perp*unit_v[1] + mid_p[0],  arm_mag_perp*unit_v[0] + mid_p[1])),
+            (end, ( arm_mag_perp*unit_v[1] + mid_p[0], -arm_mag_perp*unit_v[0] + mid_p[1]))
+        ]
     for pair in lines:
         pygame.draw.line(screen, WHITE, *pair)
 
@@ -106,17 +107,18 @@ def alignment(bird, flock, factor):
 
 
 def main():
+    clock = pygame.time.Clock()
     r = 10
     vmax = 15
-    slow_down_v = 0.5
-    dt = 0.05
+    slow_down_v = 5
+    dt = 0.5
     trail = []
     eps = r/2
     dist_error = 0
 
-    coh = 5e-4
-    sep = 5e-3
-    align = 5e-3
+    coh = 5e-3
+    sep = 5e-2
+    align = 5e-2
 
     num_birds = 30
     birds = [Bird( (random.randint(r,w-r), random.randint(r,h-r)) ) for _ in range(num_birds)]
@@ -150,7 +152,7 @@ def main():
             if abs(bird.vy) > vmax:
                 bird.vy = vmax if bird.vy>0 else -vmax
 
-            if abs(bird.vx) < 5 and abs(bird.vy) < 5:
+            if abs(bird.vx) < vmax and abs(bird.vy) < vmax:
                 bird.vx *= 1.1 
                 bird.vy *= 1.1
 
@@ -164,6 +166,7 @@ def main():
             draw_arrow(bird.pos_tuple(), v_vector)
 
         pygame.display.flip()
+        clock.tick(30)
     
     pygame.quit()
 
